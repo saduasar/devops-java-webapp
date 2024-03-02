@@ -1,37 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: loksai-eta-deploy
-  labels:
-    app: loksai-eta-app
+  name: vpro-deployment
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: loksai-eta-app
+      app: nginx
+      tier: dev
   template:
     metadata:
       labels:
-        app: loksai-eta-app
+        app: nginx
+        tier: dev
     spec:
       containers:
-      - name: loksai-eta-container
-        image: loksaieta/loksai-eta-app
-        ports:
-        - containerPort: 8080
+        - name: vpro
+          image: saduasar/java-webapp
+          env:
+            - name: demo_env
+              value: "hello, welcome to k8s"
+          ports:
+            - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: loksai-eta-np-service
-  labels:
-    app: loksai-eta-app
+  name: vpro-service
 spec:
   selector:
-    app: loksai-eta-app
-
+    app: nginx
+    tier: dev
   type: NodePort
   ports:
-  - nodePort: 31002
-    port: 8080
-    targetPort: 8080
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 32000  # Choose a port in the valid NodePort range (30000-32767)
